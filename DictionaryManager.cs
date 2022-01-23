@@ -1,4 +1,4 @@
-﻿namespace ShamelessWordlyCloneAPI
+﻿namespace ShamelessWordleCloneAPI
 {
     public class DictionaryManager
     {

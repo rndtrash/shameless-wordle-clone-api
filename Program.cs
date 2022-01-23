@@ -1,4 +1,4 @@
-using ShamelessWordlyCloneAPI;
+using ShamelessWordleCloneAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 

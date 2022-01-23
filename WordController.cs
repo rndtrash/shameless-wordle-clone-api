@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
-namespace ShamelessWordlyCloneAPI
+namespace ShamelessWordleCloneAPI
 {
     [ApiController]
     [Route("api")]

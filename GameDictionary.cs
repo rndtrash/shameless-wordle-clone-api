@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace ShamelessWordlyCloneAPI
+namespace ShamelessWordleCloneAPI
 {
     public struct GameDictionary
     {
