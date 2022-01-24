@@ -10,8 +10,8 @@ namespace ShamelessWordleCloneAPI
         [HttpGet("{dictionary}/word")]
         public IActionResult GetWord(string dictionary, double? utcOffset = 0)
         {
-            dictionary = dictionary ?? "english";
-            utcOffset = utcOffset ?? 0;
+            dictionary ??= "english";
+            utcOffset ??= 0;
 
             if (!DictionaryManager.Instance.Exists(dictionary))
                 return BadRequest("1\ndictionary doesn't exist");
