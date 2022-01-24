@@ -56,7 +56,9 @@ namespace ShamelessWordleCloneAPI
                     (WordsShuffled[i], WordsShuffled[j]) = (WordsShuffled[j], WordsShuffled[i]);
                 }
 
+#if DEBUG
                 Console.WriteLine($"{Words[Size - 1]} + {WordsShuffled.Length} + {Size}");
+#endif
             }
         }
 

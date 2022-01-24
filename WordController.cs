@@ -4,35 +4,39 @@ using System.Globalization;
 namespace ShamelessWordleCloneAPI
 {
     [ApiController]
-    [Route("api")]
+    [Route("api/dictionary")]
     public class WordController : Controller
     {
-        [HttpGet("word")]
-        public IActionResult GetWord(string? dictionary = "english", double? utcOffset = 0)
+        [HttpGet("{dictionary}/word")]
+        public IActionResult GetWord(string dictionary, double? utcOffset = 0)
         {
             dictionary = dictionary ?? "english";
             utcOffset = utcOffset ?? 0;
 
             if (!DictionaryManager.Instance.Exists(dictionary))
-                return BadRequest("dictionary doesn't exist");
+                return BadRequest("1\ndictionary doesn't exist");
 
             if (utcOffset < -12 * 60 || utcOffset > 14 * 60)
-                return BadRequest("utc offset is too small/big");
+                return BadRequest("2\nutc offset is too small/big");
+
+#if DEBUG
+            Console.WriteLine($"Time with {utcOffset} minute offset: {DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value)}; days since 1970: {(int)TimeSpan.FromSeconds(DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value).ToUnixTimeSeconds()).TotalDays}");
+#endif
 
             try
             {
                 var dict = DictionaryManager.Instance.Get(dictionary);
                 return Content(
-                    dict.WordsShuffled[DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value).ToUnixTimeSeconds() / 86400 % dict.Size]
+                    dict.WordsShuffled[(int)TimeSpan.FromSeconds(DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value).ToUnixTimeSeconds()).TotalDays % dict.Size]
                     );
             }
             catch (Exception)
             {
-                return BadRequest("internal error");
+                return BadRequest("0\ninternal error");
             }
         }
 
-        [HttpGet("dictionaries")]
+        [HttpGet]
         public IActionResult GetDictionaries()
         {
             try
@@ -41,11 +45,11 @@ namespace ShamelessWordleCloneAPI
             }
             catch (Exception)
             {
-                return BadRequest("internal error");
+                return BadRequest("0\ninternal error");
             }
         }
 
-        [HttpGet("dictionary")]
+        [HttpGet("{dictionary}")]
         public IActionResult GetDictionary(string dictionary)
         {
             try
@@ -58,7 +62,7 @@ namespace ShamelessWordleCloneAPI
             }
             catch (Exception)
             {
-                return BadRequest("internal error");
+                return BadRequest("0\ninternal error");
             }
         }
     }
