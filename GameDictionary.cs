@@ -11,7 +11,7 @@ namespace ShamelessWordleCloneAPI
         public float S;
         public float L;
         public int Seed;
-        public uint Size;
+        public int Size;
         public string[] Words;
         public string[] WordsShuffled;
 
@@ -34,7 +34,7 @@ namespace ShamelessWordleCloneAPI
 
                 if (reader.ReadLine() is not string size)
                     throw new Exception("Not a valid dictionary");
-                Size = uint.Parse(size);
+                Size = int.Parse(size);
 
                 Words = new string[Size];
                 var wp = 0;

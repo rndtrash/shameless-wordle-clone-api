@@ -57,7 +57,7 @@ namespace ShamelessWordleCloneAPI
                 var dict = DictionaryManager.Instance.Get(dictionary);
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US"); // oh fuck off
                 return Content(
-                    $"{dict.Name}\n{dict.Description}\n{dict.Glyph}\n{dict.H}\n{dict.S}\n{dict.L}"
+                    $"{dict.Name}\n{dict.Description}\n{dict.Glyph}\n{dict.H}\n{dict.S}\n{dict.L}\n{dict.Size}"
                     );
             }
             catch (Exception)
