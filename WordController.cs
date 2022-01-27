@@ -8,27 +8,15 @@ namespace ShamelessWordleCloneAPI
     public class WordController : Controller
     {
         [HttpGet("{dictionary}/word")]
-        public IActionResult GetWord(string dictionary, double? utcOffset = 0)
+        public IActionResult GetWord(string dictionary)
         {
-            dictionary ??= "english";
-            utcOffset ??= 0;
-
             if (!DictionaryManager.Instance.Exists(dictionary))
                 return BadRequest("1\ndictionary doesn't exist");
-
-            if (utcOffset < -12 * 60 || utcOffset > 14 * 60)
-                return BadRequest("2\nutc offset is too small/big");
-
-#if DEBUG
-            Console.WriteLine($"Time with {utcOffset} minute offset: {DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value)}; days since 1970: {(int)TimeSpan.FromSeconds(DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value).ToUnixTimeSeconds()).TotalDays}");
-#endif
 
             try
             {
                 var dict = DictionaryManager.Instance.Get(dictionary);
-                return Content(
-                    dict.WordsShuffled[(int)TimeSpan.FromSeconds(DateTimeOffset.UtcNow.AddMinutes(utcOffset.Value).ToUnixTimeSeconds()).TotalDays % dict.Size]
-                    );
+                return Content(dict.GetWord());
             }
             catch (Exception)
             {
@@ -41,6 +29,7 @@ namespace ShamelessWordleCloneAPI
         {
             try
             {
+                Console.WriteLine($"GetDictionaries {DictionaryManager.Instance.GetAll().Length}");
                 return Content(string.Join('\n', DictionaryManager.Instance.GetAll()));
             }
             catch (Exception)

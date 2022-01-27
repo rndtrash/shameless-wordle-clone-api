@@ -1,8 +1,10 @@
-﻿using System.Globalization;
+﻿using System.Configuration;
+using System.Globalization;
+using System.Security.Cryptography;
 
 namespace ShamelessWordleCloneAPI
 {
-    public struct GameDictionary
+    public class GameDictionary
     {
         public string Name;
         public string Description;
@@ -27,11 +29,6 @@ namespace ShamelessWordleCloneAPI
                 S = ReadFloat(reader);
                 L = ReadFloat(reader);
 
-                if (reader.ReadLine() is not string seed)
-                    throw new Exception("Not a valid dictionary");
-                Seed = int.Parse(seed);
-                var random = new Random(Seed);
-
                 if (reader.ReadLine() is not string size)
                     throw new Exception("Not a valid dictionary");
                 Size = int.Parse(size);
@@ -48,18 +45,40 @@ namespace ShamelessWordleCloneAPI
                     Words[wp++] = word;
                 }
 
-                WordsShuffled = new string[Size];
-                Words.CopyTo(WordsShuffled, 0);
-                for (int i = 0; i < Size; i++)
-                {
-                    var j = random.Next(i);
-                    (WordsShuffled[i], WordsShuffled[j]) = (WordsShuffled[j], WordsShuffled[i]);
-                }
+                Seed = GetOrMakeSeed();
+                Shuffle();
+                lastUpdate = DateTime.UtcNow;
+                cachedWord = WordsShuffled[DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 60 / 60 / 24 % Size];
 
 #if DEBUG
                 Console.WriteLine($"{Words[Size - 1]} + {WordsShuffled.Length} + {Size}");
 #endif
             }
+        }
+
+        private void Shuffle()
+        {
+            var random = new Random(Seed);
+            WordsShuffled = new string[Size];
+            Words.CopyTo(WordsShuffled, 0);
+            for (int i = 0; i < Size; i++)
+            {
+                var j = random.Next(i);
+                (WordsShuffled[i], WordsShuffled[j]) = (WordsShuffled[j], WordsShuffled[i]);
+            }
+        }
+
+        private int GetOrMakeSeed(bool regenerate = false)
+        {
+            Configuration config = System.Configuration.ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var key = $"dict.{Name}";
+            if (!regenerate && config.AppSettings.Settings.AllKeys.Contains(key))
+                return int.Parse(config.AppSettings.Settings[key].Value);
+
+            var seed = NewSeed();
+            config.AppSettings.Settings.Add(key, $"{seed}");
+            config.Save(ConfigurationSaveMode.Modified);
+            return seed;
         }
 
         static string ReadString(StreamReader reader)
@@ -76,6 +95,33 @@ namespace ShamelessWordleCloneAPI
                 throw new Exception("Not a valid dictionary");
 
             return float.Parse(s, new NumberFormatInfo() { NumberDecimalSeparator = "." });
+        }
+
+        string? cachedWord = null;
+        DateTime lastUpdate;
+
+        public int NewSeed()
+        {
+            return BitConverter.ToInt32(RandomNumberGenerator.GetBytes(sizeof(int)));
+        }
+
+        public string GetWord()
+        {
+            if (cachedWord == null || (DateTime.UtcNow - lastUpdate).Days > 0)
+            {
+                lastUpdate = DateTime.UtcNow;
+                var idx = DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 60 / 60 / 24 % Size;
+                cachedWord = WordsShuffled[idx];
+
+                if (idx == Size - 1)
+                {
+                    Seed = GetOrMakeSeed(true);
+
+                    Shuffle();
+                }
+            }
+
+            return cachedWord;
         }
     }
 }
