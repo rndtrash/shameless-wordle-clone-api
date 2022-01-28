@@ -11,7 +11,7 @@ namespace ShamelessWordleCloneAPI
         public string Glyph;
         public float H;
         public float S;
-        public float L;
+        public float V;
         public int Seed;
         public int Size;
         public string[] Words;
@@ -27,7 +27,7 @@ namespace ShamelessWordleCloneAPI
                 Glyph = ReadString(reader);
                 H = ReadFloat(reader);
                 S = ReadFloat(reader);
-                L = ReadFloat(reader);
+                V = ReadFloat(reader);
 
                 if (reader.ReadLine() is not string size)
                     throw new Exception("Not a valid dictionary");

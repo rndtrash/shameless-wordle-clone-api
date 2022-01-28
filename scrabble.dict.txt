@@ -2,8 +2,8 @@ English Extended
 Official Scrabble tournaments dictionary. Might contain weird words!
 E
 209
-0.91
-0.75
+0.47
+0.98
 8938
 aahed
 aalii
