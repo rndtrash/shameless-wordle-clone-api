@@ -29,7 +29,6 @@ namespace ShamelessWordleCloneAPI
         {
             try
             {
-                Console.WriteLine($"GetDictionaries {DictionaryManager.Instance.GetAll().Length}");
                 return Content(string.Join('\n', DictionaryManager.Instance.GetAll()));
             }
             catch (Exception)
