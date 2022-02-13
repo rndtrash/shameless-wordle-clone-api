@@ -48,7 +48,9 @@ namespace ShamelessWordleCloneAPI
                 Seed = GetOrMakeSeed();
                 Shuffle();
                 lastUpdate = DateTime.UtcNow;
-                cachedWord = WordsShuffled[DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 60 / 60 / 24 % Size];
+
+                var idx = DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 60 / 60 / 24 % Size;
+                cachedWord = new((int)idx, WordsShuffled[idx]);
 
 #if DEBUG
                 Console.WriteLine($"{Words[Size - 1]} + {WordsShuffled.Length} + {Size}");
@@ -97,7 +99,7 @@ namespace ShamelessWordleCloneAPI
             return float.Parse(s, new NumberFormatInfo() { NumberDecimalSeparator = "." });
         }
 
-        string? cachedWord = null;
+        Tuple<int, string>? cachedWord = null;
         DateTime lastUpdate;
 
         public int NewSeed()
@@ -105,13 +107,13 @@ namespace ShamelessWordleCloneAPI
             return BitConverter.ToInt32(RandomNumberGenerator.GetBytes(sizeof(int)));
         }
 
-        public string GetWord()
+        public Tuple<int, string> GetWord()
         {
             if (cachedWord == null || (DateTime.UtcNow - lastUpdate).Days > 0)
             {
                 lastUpdate = DateTime.UtcNow;
                 var idx = DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 60 / 60 / 24 % Size;
-                cachedWord = WordsShuffled[idx];
+                cachedWord = new((int)idx + 1, WordsShuffled[idx]);
 
                 if (idx == Size - 1)
                 {

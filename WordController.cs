@@ -15,8 +15,8 @@ namespace ShamelessWordleCloneAPI
 
             try
             {
-                var dict = DictionaryManager.Instance.Get(dictionary);
-                return Content(dict.GetWord());
+                var word = DictionaryManager.Instance.Get(dictionary).GetWord();
+                return Content($"{word.Item1}\n{word.Item2}");
             }
             catch (Exception)
             {
